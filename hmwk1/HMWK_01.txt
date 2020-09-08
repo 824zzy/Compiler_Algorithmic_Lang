@@ -1,0 +1,199 @@
+#----------------------------------------------------------------------
+Programming Assignment 01
+
+#----------------------------------------------------------------------
+Purpose:
+
+  * Demonstrate working flex / bison / C development environment.
+
+  * Demonstrate ability to take a screenshot and upload it to
+      Canvas.  (No, really;  for some persons, this is harder
+      than it sounds. :)
+
+#----------------------------------------------------------------------
+Background:
+
+  * You need some packages installed to do the assignments.
+      Get them!  In particular,
+        - build-essential
+        - libreadline-dev
+        - bison
+        - flex
+        - xsltproc
+
+  * Here's the version information from my Raspberry Pi 3
+    installation:
+
+  $ apt-cache policy build-essential
+  build-essential:
+    Installed: 12.6
+    Candidate: 12.6
+    Version table:
+   *** 12.6 500
+          500 http://raspbian.raspberrypi.org/raspbian buster/main armhf Packages
+          100 /var/lib/dpkg/status
+
+  $ apt-cache policy libreadline-dev
+  libreadline-dev:
+    Installed: 7.0-5
+    Candidate: 7.0-5
+    Version table:
+   *** 7.0-5 500
+          500 http://raspbian.raspberrypi.org/raspbian buster/main armhf Packages
+          100 /var/lib/dpkg/status
+
+  $ apt-cache policy bison
+  bison:
+    Installed: 2:3.3.2.dfsg-1
+    Candidate: 2:3.3.2.dfsg-1
+    Version table:
+   *** 2:3.3.2.dfsg-1 500
+          500 http://raspbian.raspberrypi.org/raspbian buster/main armhf Packages
+          100 /var/lib/dpkg/status
+
+  $ apt-cache policy flex
+  flex:
+    Installed: 2.6.4-6.2
+    Candidate: 2.6.4-6.2
+    Version table:
+   *** 2.6.4-6.2 500
+          500 http://raspbian.raspberrypi.org/raspbian buster/main armhf Packages
+          100 /var/lib/dpkg/status
+
+  $ apt-cache policy xsltproc
+  xsltproc:
+    Installed: 1.1.32-2.2~deb10u1
+    Candidate: 1.1.32-2.2~deb10u1
+    Version table:
+   *** 1.1.32-2.2~deb10u1 500
+          500 http://raspbian.raspberrypi.org/raspbian buster/main armhf Packages
+          100 /var/lib/dpkg/status
+
+#----------------------------------------------------------------------
+Tasks:
+
+  1. Download hmwk_01_dalioba.zip from Canvas.
+
+  2. Unzip the file somewhere convenient.
+
+  3. Look in the directory hmwk_01_dalioba.
+
+  4. Compile and run the calculator as follows,
+
+    $ make clean
+    rm -f *.o lex.yy.c lex.yy.h parser.tab.c parser.tab.h parser.output parser.xml parser.html calc
+
+    $ make
+
+    #-- Lexical Analyzer -------------------
+    flex lexer.l
+    flex version 2.6.4 usage statistics:
+      scanner options: -s--reentrant--bison-bridgevB8 -Cem
+      41/2000 NFA states
+      15/1000 DFA states (62 words)
+      9 rules
+      Compressed tables always back-up
+      1/40 start conditions
+      31 epsilon states, 13 double epsilon states
+      5/100 character classes needed 15/500 words of storage, 0 reused
+      28 state/nextstate pairs created
+      25/3 unique/duplicate transitions
+      17/1000 base-def entries created
+      25/2000 (peak 20) nxt-chk entries created
+      4/2500 (peak 20) template nxt-chk entries created
+      0 empty table entries
+      2 protos created
+      2 templates created, 3 uses
+      10/256 equivalence classes created
+      2/256 meta-equivalence classes created
+      0 (0 saved) hash collisions, 13 DFAs equal
+      0 sets of reallocations needed
+      350 total table entries needed
+
+    #-- Syntactic Analyzer -----------------
+    bison --report=all --xml parser.y
+    xsltproc /usr/share/bison/xslt/xml2xhtml.xsl parser.xml > parser.html
+    rm -f parser.xml
+
+    #-- Put it all together ----------------
+    gcc -g -Wall -Wextra -fsanitize=address -fsanitize=leak -static-libasan lex.yy.c parser.tab.c expr.c main.c -o calc -lreadline
+
+    $ ./calc
+    > 12 + 34 * 56 / 78 - 90
+    "12 + 34 * 56 / 78 - 90" ==> -54.
+
+     (BOP SUBTRACT
+      (BOP ADD
+       (LITERAL INTEGER 12)
+       (BOP DIVIDE
+        (BOP MULTIPLY
+         (LITERAL INTEGER 34)
+         (LITERAL INTEGER 56)
+        )
+        (LITERAL INTEGER 78)
+       )
+      )
+      (LITERAL INTEGER 90)
+     )
+    >
+    $
+
+  5. Use ctrl-D (which is the EOF marker) to exit the calculator.
+
+  6. When you run the calculator, use your Student ID (a ten-digit
+       number) as the data for the example calculation.  Separate
+       the number into five (5) two-digit numbers and put the
+       four (4) fundamental binary operations between them.  Do
+       this in the order shown, +, *, /, and -.
+
+       So, for example, if your Student ID is 1001234567, your
+       example calculation should be:
+
+          10 + 01 * 23 / 45 - 67
+
+  7. Take a screenshot of calc running with your example
+       calculation.  In PNG format!  Name it HMWK_01_abc1234.png,
+       where 'abc1234' is YOUR NetID.
+
+#----------------------------------------------------------------------
+Submission:
+
+Upload the screenshot you just took as evidence that you got this
+working OK.
+
+Remember, the name of the file should be HMWK_01_abc1234.png,
+where 'abc1234' is YOUR NetID.
+
+The image file needs to be png, Portable Network Graphics, so we
+can view it.
+
+Different OSes have a history of mucking with screenshots and file
+formats, so ENSURE that your screenshot is actually a png file and
+not some proprietary format.  If your screenshot is not viewable,
+you get ZERO credit, so be careful!
+
+#----------------------------------------------------------------------
+Hints:
+  1. For a normal homework, there would be some advice here, but
+       frankly this homework is so simple, I don't know what
+       advice to give you.
+
+  2. Just to re-iterate, ensure that your screenshot is really a
+       REAL png file and not some foo-foo proprietary format
+       that's unviewable elsewhere.
+
+  3. Ensure that your screenshot is named HMWK_01_abc1234.png,
+       where 'abc1234' is YOUR NetID.
+
+  4. After you submit your png file on Canvas, download it from
+     Canvas and check that your example calculation is in the
+     proper format, the screenshot is really a png file, is named
+     correctly, and so forth.
+
+     Submissions in the wrong format score ZERO credit.
+
+  5. Are you CERTAIN you complied with all of these nit-picking
+     instructions?  Really?  Maybe you ought to check just one
+     more time. :)
+
+#----------------------------------------------------------------------
