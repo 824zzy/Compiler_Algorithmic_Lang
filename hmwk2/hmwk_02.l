@@ -1,4 +1,4 @@
-  // Zhu, Zhengyuan.
+  // Zhu, Zhengyuan
   // zxz8274
   // 2020-09-24
 
@@ -180,22 +180,18 @@ int main( int argc, char *argv[] )
         break;
       
       case tok_COLON:
-        // TODO:
         printf( "COLON\n" );
         break;
       
       case tok_COMMA:
-        // TODO:
         printf( "COMMA\n" );
         break;
       
       case tok_DBL_LIT:
-        // TODO:
         printf( "DOUBLE_LITERAL %g\n", yylval.dblval );
         break;
       
       case tok_SEMICOLON:
-        // TODO:
         printf( "SEMICOLON\n" );
         break;
       
