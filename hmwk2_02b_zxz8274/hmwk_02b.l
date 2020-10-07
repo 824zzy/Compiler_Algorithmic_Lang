@@ -46,6 +46,7 @@ enum {
   tok_ID,
   tok_INT_LIT,
   tok_STR_LIT,
+  tok_CHR_LIT,
 };
 
 // This union is usually defined by bison.  Since this is a
@@ -68,14 +69,34 @@ DIGIT         [0-9]
 
 EXPONENT      [eE][-+]?[0-9]+
 
+ESCAPE        {LETTERESCAPE}|{OCTALESCAPE}|{HEXESCAPE}
+LETTERESCAPE  [\\][abfnrtv]|[\\\\][\'\"\\?\\]
+OCTALESCAPE   [\\]([0-7]|[0-7][0-7]|[0-3][0-7][0-7])
+HEXESCAPE     [\\][x]([_a-fA-F0-9]|[_a-fA-F0-9][_a-fA-F0-9])
+
+
+
 %% //---- RULES --------------------------------------------------
 
-[:,.;]   { _setTokenPos();  return yytext[0]; }
+[:,.;*+-/]  { 
+  _setTokenPos();
 
-["][^\n"]*["]  {
+  return yytext[0]; 
+}
+
+[//].*  { }
+  
+
+["]([^"]|\\.)*["]  {
   _setTokenPos();
 
   return tok_STR_LIT;
+}
+
+[\']([^\n"]|{ESCAPE})[\']  {
+  _setTokenPos();
+
+  return tok_CHR_LIT;
 }
 
 ({DIGIT}+{EXPONENT})|({DIGIT}*({DIGIT}\.|\.{DIGIT}){DIGIT}*{EXPONENT}?)   {
@@ -105,6 +126,7 @@ EXPONENT      [eE][-+]?[0-9]+
 
 }
 
+
 [\r\n]+     { yycolnoBegin = yycolnoEnd = 0; }
 
 .       {
@@ -116,13 +138,17 @@ EXPONENT      [eE][-+]?[0-9]+
 
 %% //---- USER CODE ----------------------------------------------
 
-char *charTokens = ":,.;";
+char *charTokens = ":,.;+-*/";
 
 char *charTokenNames[] = {
   "COLON",
   "COMMA",
   "PERIOD",
   "SEMICOLON",
+  "PLUS",
+  "MINUS",
+  "MULTIPLY",
+  "DIVIDE",
 };
 
 int main( int argc, char *argv[] )
@@ -159,7 +185,7 @@ int main( int argc, char *argv[] )
     printf( "(%d:%d-%d) ", yylineno, yycolnoBegin, yycolnoEnd );
 
     switch ( tok ) {
-      case ':' :  case ',' :  case '.' :  case ';' :
+      case ':' :  case ',' :  case '.' :  case ';' : case '+' : case '-' : case '*' : case '/' :
         printf( "%s\n", charTokenNames[ strchr( charTokens, tok ) - charTokens ] );
         break;
 
@@ -177,6 +203,10 @@ int main( int argc, char *argv[] )
 
       case tok_STR_LIT :
         printf( "STRING_LITERAL %s\n", yytext );
+        break;
+
+      case tok_CHR_LIT :
+        printf( "CHARACTER_LITERAL %s\n", yytext );
         break;
 
       default :
